@@ -5,7 +5,6 @@
 Toto je Python: `Guess a number!`
 
 TODO: Přidáme počítadlo pokusů!
-FIXME: Ošetři `ValuError` při zadání nesprávné hodnoty.
 """
 
 import random
@@ -41,3 +40,4 @@ def guess_number():
 
 if __name__ == "__main__":
     guess_number()
+    
