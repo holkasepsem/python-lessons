@@ -59,7 +59,7 @@ if __name__ == "__main__":
     print(dir(c))
     print(c.area())
 
-    r = Rectangle(1,1)
+    r = Rectangle(1, 1)
     r_area = r.area()
     print(r_area)
 
