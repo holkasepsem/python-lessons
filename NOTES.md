@@ -17,7 +17,11 @@ ls (list)
 
 pwd (print working directory)
 
-    pwd    ukáže kde právvě jsem
+    pwd    ukáže kde právě jsem
+
+brew	
+
+rm (remove)	smazání souboru/adresáře
 
 whoami 
 
@@ -33,7 +37,7 @@ Načíst soubor s nastavením
 
 mkdir (make direcotry)
     
-    mkdir {dir_name}
+    mkdir {dir_name}	vytvoří nový adresář
 
 
 ## Instalace nástroje `git` 
@@ -43,4 +47,22 @@ mkdir (make direcotry)
 
 ### Základní příkazy programu `git`
 
-    git clone {url}
+    git clone {url}	naklonování repozitáře
+
+    git init		vytvoří nový repozitář
+
+	git commit -m  "Zpráva"
+
+	git commit		dokončení sloučením
+
+	git push / git push origin master	uložení repozitáře
+
+	git pull / git pull origin master	aktualizace lokální kopie
+
+	git fetch		
+
+	git status		vypíše seznam změn
+
+
+## PEP8 (úprava dokumentů v Pythonu)
+
