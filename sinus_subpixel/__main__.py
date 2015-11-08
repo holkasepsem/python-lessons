@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+
 import pygame
 from pygame.locals import *
 from subpixel_surface import *
 from math import sin, cos
+
 
 DOTS = 100
 
@@ -14,7 +16,7 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((640, 480))
     clock = pygame.time.Clock()
-    dot = pygame.image.load("dot.png")
+    dot = pygame.image.load("./dot.png")
     dot_subpixel = SubPixelSurface(dot, x_level=8)
 
     t = 0.
