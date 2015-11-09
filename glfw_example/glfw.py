@@ -27,12 +27,14 @@ try:
     _getcwd = os.getcwdu
 except AttributeError:
     _getcwd = os.getcwd
-if sys.version_info.major > 2:
+
+if sys.version_info.major >= 3:
     _to_char_p = lambda s: s.encode('utf-8')
 else:
     _to_char_p = lambda s: s
 
 
+# -----------------------------------------------------------------------------
 def _find_library_candidates(lib_names, lib_extensions, lib_search_paths):
     '''
     Finds and returns filenames which might be the library you are looking for.
@@ -63,6 +65,7 @@ def _find_library_candidates(lib_names, lib_extensions, lib_search_paths):
     return candidates
 
 
+# -----------------------------------------------------------------------------
 def _load_library(lib_names, lib_extensions,
                   lib_search_paths, version_check_callback):
     '''
@@ -83,6 +86,7 @@ def _load_library(lib_names, lib_extensions,
     return ctypes.CDLL(library_versions[-1][1])
 
 
+# -----------------------------------------------------------------------------
 def _glfw_get_version(filename):
     '''
     Queries and returns the library version tuple or None by using a
@@ -136,6 +140,8 @@ def _glfw_get_version(filename):
     else:
         return None
 
+
+# -----------------------------------------------------------------------------
 if sys.platform == 'win32':
     # only try glfw3.dll on windows
     try:
@@ -153,6 +159,7 @@ if _glfw is None:
 _callback_repositories = []
 
 
+# -----------------------------------------------------------------------------
 class _GLFWwindow(ctypes.Structure):
     '''
     Wrapper for:
@@ -257,6 +264,7 @@ class _GLFWgammaramp(ctypes.Structure):
         return red, green, blue
 
 
+# -----------------------------------------------------------------------------
 VERSION_MAJOR = 3
 VERSION_MINOR = 0
 VERSION_REVISION = 3
@@ -473,61 +481,75 @@ CONNECTED = 0x00040001
 DISCONNECTED = 0x00040002
 
 
+# -----------------------------------------------------------------------------
 _GLFWerrorfun = ctypes.CFUNCTYPE(None,
                                  ctypes.c_int,
                                  ctypes.c_char_p)
+
 _GLFWwindowposfun = ctypes.CFUNCTYPE(None,
                                      ctypes.POINTER(_GLFWwindow),
                                      ctypes.c_int,
                                      ctypes.c_int)
+
 _GLFWwindowsizefun = ctypes.CFUNCTYPE(None,
                                       ctypes.POINTER(_GLFWwindow),
                                       ctypes.c_int,
                                       ctypes.c_int)
+
 _GLFWwindowclosefun = ctypes.CFUNCTYPE(None,
                                        ctypes.POINTER(_GLFWwindow))
 _GLFWwindowrefreshfun = ctypes.CFUNCTYPE(None,
                                          ctypes.POINTER(_GLFWwindow))
+
 _GLFWwindowfocusfun = ctypes.CFUNCTYPE(None,
                                        ctypes.POINTER(_GLFWwindow),
                                        ctypes.c_int)
+
 _GLFWwindowiconifyfun = ctypes.CFUNCTYPE(None,
                                          ctypes.POINTER(_GLFWwindow),
                                          ctypes.c_int)
+
 _GLFWframebuffersizefun = ctypes.CFUNCTYPE(None,
                                            ctypes.POINTER(_GLFWwindow),
                                            ctypes.c_int,
                                            ctypes.c_int)
+
 _GLFWmousebuttonfun = ctypes.CFUNCTYPE(None,
                                        ctypes.POINTER(_GLFWwindow),
                                        ctypes.c_int,
                                        ctypes.c_int,
                                        ctypes.c_int)
+
 _GLFWcursorposfun = ctypes.CFUNCTYPE(None,
                                      ctypes.POINTER(_GLFWwindow),
                                      ctypes.c_double,
                                      ctypes.c_double)
+
 _GLFWcursorenterfun = ctypes.CFUNCTYPE(None,
                                        ctypes.POINTER(_GLFWwindow),
                                        ctypes.c_int)
+
 _GLFWscrollfun = ctypes.CFUNCTYPE(None,
                                   ctypes.POINTER(_GLFWwindow),
                                   ctypes.c_double,
                                   ctypes.c_double)
+
 _GLFWkeyfun = ctypes.CFUNCTYPE(None,
                                ctypes.POINTER(_GLFWwindow),
                                ctypes.c_int,
                                ctypes.c_int,
                                ctypes.c_int,
                                ctypes.c_int)
+
 _GLFWcharfun = ctypes.CFUNCTYPE(None,
                                 ctypes.POINTER(_GLFWwindow),
                                 ctypes.c_int)
+
 _GLFWmonitorfun = ctypes.CFUNCTYPE(None,
                                    ctypes.POINTER(_GLFWmonitor),
                                    ctypes.c_int)
 
-
+# -----------------------------------------------------------------------------
 _glfw.glfwInit.restype = ctypes.c_int
 _glfw.glfwInit.argtypes = []
 
@@ -544,6 +566,8 @@ def init():
     os.chdir(cwd)
     return res
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwTerminate.restype = None
 _glfw.glfwTerminate.argtypes = []
 
@@ -563,6 +587,8 @@ def terminate():
         del _window_user_data_repository[window_addr]
     _glfw.glfwTerminate()
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetVersion.restype = None
 _glfw.glfwGetVersion.argtypes = [ctypes.POINTER(ctypes.c_int),
                                  ctypes.POINTER(ctypes.c_int),
@@ -585,6 +611,8 @@ def get_version():
     _glfw.glfwGetVersion(major, minor, rev)
     return major_value.value, minor_value.value, rev_value.value
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetVersionString.restype = ctypes.c_char_p
 _glfw.glfwGetVersionString.argtypes = []
 
@@ -598,6 +626,8 @@ def get_version_string():
     '''
     return _glfw.glfwGetVersionString()
 
+
+# -----------------------------------------------------------------------------
 _error_callback = None
 _glfw.glfwSetErrorCallback.restype = _GLFWerrorfun
 _glfw.glfwSetErrorCallback.argtypes = [_GLFWerrorfun]
@@ -621,6 +651,8 @@ def set_error_callback(cbfun):
     if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetMonitors.restype = ctypes.POINTER(ctypes.POINTER(_GLFWmonitor))
 _glfw.glfwGetMonitors.argtypes = [ctypes.POINTER(ctypes.c_int)]
 
@@ -638,6 +670,8 @@ def get_monitors():
     monitors = [result[i] for i in range(count_value.value)]
     return monitors
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetPrimaryMonitor.restype = ctypes.POINTER(_GLFWmonitor)
 _glfw.glfwGetPrimaryMonitor.argtypes = []
 
@@ -651,6 +685,8 @@ def get_primary_monitor():
     '''
     return _glfw.glfwGetPrimaryMonitor()
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetMonitorPos.restype = None
 _glfw.glfwGetMonitorPos.argtypes = [ctypes.POINTER(_GLFWmonitor),
                                     ctypes.POINTER(ctypes.c_int),
@@ -671,6 +707,8 @@ def get_monitor_pos(monitor):
     _glfw.glfwGetMonitorPos(monitor, xpos, ypos)
     return xpos_value.value, ypos_value.value
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetMonitorPhysicalSize.restype = None
 _glfw.glfwGetMonitorPhysicalSize.argtypes = [ctypes.POINTER(_GLFWmonitor),
                                              ctypes.POINTER(ctypes.c_int),
@@ -682,7 +720,8 @@ def get_monitor_physical_size(monitor):
     Returns the physical size of the monitor.
 
     Wrapper for:
-        void glfwGetMonitorPhysicalSize(GLFWmonitor* monitor, int* width, int* height);
+        void glfwGetMonitorPhysicalSize(GLFWmonitor* monitor,
+                                        int* width, int* height);
     '''
     width_value = ctypes.c_int(0)
     width = ctypes.pointer(width_value)
@@ -691,6 +730,8 @@ def get_monitor_physical_size(monitor):
     _glfw.glfwGetMonitorPhysicalSize(monitor, width, height)
     return width_value.value, height_value.value
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetMonitorName.restype = ctypes.c_char_p
 _glfw.glfwGetMonitorName.argtypes = [ctypes.POINTER(_GLFWmonitor)]
 
@@ -704,6 +745,8 @@ def get_monitor_name(monitor):
     '''
     return _glfw.glfwGetMonitorName(monitor)
 
+
+# -----------------------------------------------------------------------------
 _monitor_callback = None
 _glfw.glfwSetMonitorCallback.restype = _GLFWmonitorfun
 _glfw.glfwSetMonitorCallback.argtypes = [_GLFWmonitorfun]
@@ -727,6 +770,8 @@ def set_monitor_callback(cbfun):
     if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetVideoModes.restype = ctypes.POINTER(_GLFWvidmode)
 _glfw.glfwGetVideoModes.argtypes = [ctypes.POINTER(_GLFWmonitor),
                                     ctypes.POINTER(ctypes.c_int)]
@@ -745,6 +790,8 @@ def get_video_modes(monitor):
     videomodes = [result[i].unwrap() for i in range(count_value.value)]
     return videomodes
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetVideoMode.restype = ctypes.POINTER(_GLFWvidmode)
 _glfw.glfwGetVideoMode.argtypes = [ctypes.POINTER(_GLFWmonitor)]
 
@@ -759,6 +806,8 @@ def get_video_mode(monitor):
     videomode = _glfw.glfwGetVideoMode(monitor).contents
     return videomode.unwrap()
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwSetGamma.restype = None
 _glfw.glfwSetGamma.argtypes = [ctypes.POINTER(_GLFWmonitor),
                                ctypes.c_float]
@@ -773,6 +822,8 @@ def set_gamma(monitor, gamma):
     '''
     _glfw.glfwSetGamma(monitor, gamma)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetGammaRamp.restype = ctypes.POINTER(_GLFWgammaramp)
 _glfw.glfwGetGammaRamp.argtypes = [ctypes.POINTER(_GLFWmonitor)]
 
@@ -787,6 +838,8 @@ def get_gamma_ramp(monitor):
     gammaramp = _glfw.glfwGetGammaRamp(monitor).contents
     return gammaramp.unwrap()
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwSetGammaRamp.restype = None
 _glfw.glfwSetGammaRamp.argtypes = [ctypes.POINTER(_GLFWmonitor),
                                    ctypes.POINTER(_GLFWgammaramp)]
@@ -803,6 +856,8 @@ def set_gamma_ramp(monitor, ramp):
     gammaramp.wrap(ramp)
     _glfw.glfwSetGammaRamp(monitor, ctypes.pointer(gammaramp))
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwDefaultWindowHints.restype = None
 _glfw.glfwDefaultWindowHints.argtypes = []
 
@@ -816,6 +871,8 @@ def default_window_hints():
     '''
     _glfw.glfwDefaultWindowHints()
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwWindowHint.restype = None
 _glfw.glfwWindowHint.argtypes = [ctypes.c_int,
                                  ctypes.c_int]
@@ -831,6 +888,7 @@ def window_hint(target, hint):
     _glfw.glfwWindowHint(target, hint)
 
 
+# -----------------------------------------------------------------------------
 _glfw.glfwCreateWindow.restype = ctypes.POINTER(_GLFWwindow)
 _glfw.glfwCreateWindow.argtypes = [ctypes.c_int,
                                    ctypes.c_int,
@@ -850,6 +908,8 @@ def create_window(width, height, title, monitor, share):
     return _glfw.glfwCreateWindow(width, height, _to_char_p(title),
                                   monitor, share)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwDestroyWindow.restype = None
 _glfw.glfwDestroyWindow.argtypes = [ctypes.POINTER(_GLFWwindow)]
 
@@ -870,6 +930,8 @@ def destroy_window(window):
     if window_addr in _window_user_data_repository:
         del _window_user_data_repository[window_addr]
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwWindowShouldClose.restype = ctypes.c_int
 _glfw.glfwWindowShouldClose.argtypes = [ctypes.POINTER(_GLFWwindow)]
 
@@ -883,6 +945,8 @@ def window_should_close(window):
     '''
     return _glfw.glfwWindowShouldClose(window)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwSetWindowShouldClose.restype = None
 _glfw.glfwSetWindowShouldClose.argtypes = [ctypes.POINTER(_GLFWwindow),
                                            ctypes.c_int]
@@ -897,6 +961,8 @@ def set_window_should_close(window, value):
     '''
     _glfw.glfwSetWindowShouldClose(window, value)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwSetWindowTitle.restype = None
 _glfw.glfwSetWindowTitle.argtypes = [ctypes.POINTER(_GLFWwindow),
                                      ctypes.c_char_p]
@@ -911,6 +977,8 @@ def set_window_title(window, title):
     '''
     _glfw.glfwSetWindowTitle(window, _to_char_p(title))
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetWindowPos.restype = None
 _glfw.glfwGetWindowPos.argtypes = [ctypes.POINTER(_GLFWwindow),
                                    ctypes.POINTER(ctypes.c_int),
@@ -932,6 +1000,7 @@ def get_window_pos(window):
     return xpos_value.value, ypos_value.value
 
 
+# -----------------------------------------------------------------------------
 _glfw.glfwSetWindowPos.restype = None
 _glfw.glfwSetWindowPos.argtypes = [ctypes.POINTER(_GLFWwindow),
                                    ctypes.c_int,
@@ -947,10 +1016,14 @@ def set_window_pos(window, xpos, ypos):
     '''
     _glfw.glfwSetWindowPos(window, xpos, ypos)
 
+
 _glfw.glfwGetWindowSize.restype = None
 _glfw.glfwGetWindowSize.argtypes = [ctypes.POINTER(_GLFWwindow),
                                     ctypes.POINTER(ctypes.c_int),
                                     ctypes.POINTER(ctypes.c_int)]
+
+
+# -----------------------------------------------------------------------------
 def get_window_size(window):
     '''
     Retrieves the size of the client area of the specified window.
@@ -965,10 +1038,13 @@ def get_window_size(window):
     _glfw.glfwGetWindowSize(window, width, height)
     return width_value.value, height_value.value
 
+
 _glfw.glfwSetWindowSize.restype = None
 _glfw.glfwSetWindowSize.argtypes = [ctypes.POINTER(_GLFWwindow),
                                     ctypes.c_int,
                                     ctypes.c_int]
+
+
 def set_window_size(window, width, height):
     '''
     Sets the size of the client area of the specified window.
@@ -982,12 +1058,15 @@ _glfw.glfwGetFramebufferSize.restype = None
 _glfw.glfwGetFramebufferSize.argtypes = [ctypes.POINTER(_GLFWwindow),
                                          ctypes.POINTER(ctypes.c_int),
                                          ctypes.POINTER(ctypes.c_int)]
+
+
 def get_framebuffer_size(window):
     '''
     Retrieves the size of the framebuffer of the specified window.
 
     Wrapper for:
-        void glfwGetFramebufferSize(GLFWwindow* window, int* width, int* height);
+        void glfwGetFramebufferSize(GLFWwindow* window,
+                                    int* width, int* height);
     '''
     width_value = ctypes.c_int(0)
     width = ctypes.pointer(width_value)
@@ -996,8 +1075,12 @@ def get_framebuffer_size(window):
     _glfw.glfwGetFramebufferSize(window, width, height)
     return width_value.value, height_value.value
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwIconifyWindow.restype = None
 _glfw.glfwIconifyWindow.argtypes = [ctypes.POINTER(_GLFWwindow)]
+
+
 def iconify_window(window):
     '''
     Iconifies the specified window.
@@ -1007,8 +1090,12 @@ def iconify_window(window):
     '''
     _glfw.glfwIconifyWindow(window)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwRestoreWindow.restype = None
 _glfw.glfwRestoreWindow.argtypes = [ctypes.POINTER(_GLFWwindow)]
+
+
 def restore_window(window):
     '''
     Restores the specified window.
@@ -1018,8 +1105,12 @@ def restore_window(window):
     '''
     _glfw.glfwRestoreWindow(window)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwShowWindow.restype = None
 _glfw.glfwShowWindow.argtypes = [ctypes.POINTER(_GLFWwindow)]
+
+
 def show_window(window):
     '''
     Makes the specified window visible.
@@ -1029,8 +1120,12 @@ def show_window(window):
     '''
     _glfw.glfwShowWindow(window)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwHideWindow.restype = None
 _glfw.glfwHideWindow.argtypes = [ctypes.POINTER(_GLFWwindow)]
+
+
 def hide_window(window):
     '''
     Hides the specified window.
@@ -1040,8 +1135,12 @@ def hide_window(window):
     '''
     _glfw.glfwHideWindow(window)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetWindowMonitor.restype = ctypes.POINTER(_GLFWmonitor)
 _glfw.glfwGetWindowMonitor.argtypes = [ctypes.POINTER(_GLFWwindow)]
+
+
 def get_window_monitor(window):
     '''
     Returns the monitor that the window uses for full screen mode.
@@ -1051,9 +1150,13 @@ def get_window_monitor(window):
     '''
     return _glfw.glfwGetWindowMonitor(window)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetWindowAttrib.restype = ctypes.c_int
 _glfw.glfwGetWindowAttrib.argtypes = [ctypes.POINTER(_GLFWwindow),
                                       ctypes.c_int]
+
+
 def get_window_attrib(window, attrib):
     '''
     Returns an attribute of the specified window.
@@ -1063,15 +1166,20 @@ def get_window_attrib(window, attrib):
     '''
     return _glfw.glfwGetWindowAttrib(window, attrib)
 
+
+# -----------------------------------------------------------------------------
 _window_user_data_repository = {}
 _glfw.glfwSetWindowUserPointer.restype = None
 _glfw.glfwSetWindowUserPointer.argtypes = [ctypes.POINTER(_GLFWwindow),
                                            ctypes.c_void_p]
+
+
 def set_window_user_pointer(window, pointer):
     '''
-    Sets the user pointer of the specified window. You may pass a normal python object into this function and it will
-    be wrapped automatically. The object will be kept in existence until the pointer is set to something else or
-    until the window is destroyed.
+    Sets the user pointer of the specified window. You may pass a normal
+    python object into this function and it will be wrapped automatically.
+    The object will be kept in existence until the pointer is set to something
+    else or until the window is destroyed.
 
     Wrapper for:
         void glfwSetWindowUserPointer(GLFWwindow* window, void* pointer);
@@ -1081,15 +1189,20 @@ def set_window_user_pointer(window, pointer):
     if not isinstance(pointer, ctypes.c_void_p):
         data = (True, pointer)
         # Create a void pointer for the python object
-        pointer = ctypes.cast(ctypes.pointer(ctypes.py_object(pointer)), ctypes.c_void_p)
+        pointer = ctypes.cast(ctypes.pointer(ctypes.py_object(pointer)),
+                              ctypes.c_void_p)
 
     window_addr = ctypes.cast(ctypes.pointer(window),
                               ctypes.POINTER(ctypes.c_long)).contents.value
     _window_user_data_repository[window_addr] = data
     _glfw.glfwSetWindowUserPointer(window, pointer)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetWindowUserPointer.restype = ctypes.c_void_p
 _glfw.glfwGetWindowUserPointer.argtypes = [ctypes.POINTER(_GLFWwindow)]
+
+
 def get_window_user_pointer(window):
     '''
     Returns the user pointer of the specified window.
@@ -1108,17 +1221,22 @@ def get_window_user_pointer(window):
             return data[1]
     return _glfw.glfwGetWindowUserPointer(window)
 
+
+# -----------------------------------------------------------------------------
 _window_pos_callback_repository = {}
 _callback_repositories.append(_window_pos_callback_repository)
 _glfw.glfwSetWindowPosCallback.restype = _GLFWwindowposfun
 _glfw.glfwSetWindowPosCallback.argtypes = [ctypes.POINTER(_GLFWwindow),
                                            _GLFWwindowposfun]
+
+
 def set_window_pos_callback(window, cbfun):
     '''
     Sets the position callback for the specified window.
 
     Wrapper for:
-        GLFWwindowposfun glfwSetWindowPosCallback(GLFWwindow* window, GLFWwindowposfun cbfun);
+        GLFWwindowposfun glfwSetWindowPosCallback(GLFWwindow* window,
+                                                  GLFWwindowposfun cbfun);
     '''
     window_addr = ctypes.cast(ctypes.pointer(window),
                               ctypes.POINTER(ctypes.c_long)).contents.value
@@ -1126,26 +1244,34 @@ def set_window_pos_callback(window, cbfun):
         previous_callback = _window_pos_callback_repository[window_addr]
     else:
         previous_callback = None
+
     if cbfun is None:
         cbfun = 0
+
     c_cbfun = _GLFWwindowposfun(cbfun)
     _window_pos_callback_repository[window_addr] = (cbfun, c_cbfun)
     cbfun = c_cbfun
     _glfw.glfwSetWindowPosCallback(window, cbfun)
+
     if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
+
+# -----------------------------------------------------------------------------
 _window_size_callback_repository = {}
 _callback_repositories.append(_window_size_callback_repository)
 _glfw.glfwSetWindowSizeCallback.restype = _GLFWwindowsizefun
 _glfw.glfwSetWindowSizeCallback.argtypes = [ctypes.POINTER(_GLFWwindow),
                                             _GLFWwindowsizefun]
+
+
 def set_window_size_callback(window, cbfun):
     '''
     Sets the size callback for the specified window.
 
     Wrapper for:
-        GLFWwindowsizefun glfwSetWindowSizeCallback(GLFWwindow* window, GLFWwindowsizefun cbfun);
+        GLFWwindowsizefun glfwSetWindowSizeCallback(GLFWwindow* window,
+                                                    GLFWwindowsizefun cbfun);
     '''
     window_addr = ctypes.cast(ctypes.pointer(window),
                               ctypes.POINTER(ctypes.c_long)).contents.value
@@ -1162,17 +1288,23 @@ def set_window_size_callback(window, cbfun):
     if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
+
+# -----------------------------------------------------------------------------
 _window_close_callback_repository = {}
 _callback_repositories.append(_window_close_callback_repository)
 _glfw.glfwSetWindowCloseCallback.restype = _GLFWwindowclosefun
 _glfw.glfwSetWindowCloseCallback.argtypes = [ctypes.POINTER(_GLFWwindow),
                                              _GLFWwindowclosefun]
+
+
 def set_window_close_callback(window, cbfun):
     '''
     Sets the close callback for the specified window.
 
     Wrapper for:
-        GLFWwindowclosefun glfwSetWindowCloseCallback(GLFWwindow* window, GLFWwindowclosefun cbfun);
+        GLFWwindowclosefun
+            glfwSetWindowCloseCallback(GLFWwindow* window,
+                                       GLFWwindowclosefun cbfun);
     '''
     window_addr = ctypes.cast(ctypes.pointer(window),
                               ctypes.POINTER(ctypes.c_long)).contents.value
@@ -1189,17 +1321,23 @@ def set_window_close_callback(window, cbfun):
     if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
+
+# -----------------------------------------------------------------------------
 _window_refresh_callback_repository = {}
 _callback_repositories.append(_window_refresh_callback_repository)
 _glfw.glfwSetWindowRefreshCallback.restype = _GLFWwindowrefreshfun
 _glfw.glfwSetWindowRefreshCallback.argtypes = [ctypes.POINTER(_GLFWwindow),
                                                _GLFWwindowrefreshfun]
+
+
 def set_window_refresh_callback(window, cbfun):
     '''
     Sets the refresh callback for the specified window.
 
     Wrapper for:
-        GLFWwindowrefreshfun glfwSetWindowRefreshCallback(GLFWwindow* window, GLFWwindowrefreshfun cbfun);
+        GLFWwindowrefreshfun
+            glfwSetWindowRefreshCallback(GLFWwindow* window,
+                                         GLFWwindowrefreshfun cbfun);
     '''
     window_addr = ctypes.cast(ctypes.pointer(window),
                               ctypes.POINTER(ctypes.c_long)).contents.value
@@ -1216,17 +1354,23 @@ def set_window_refresh_callback(window, cbfun):
     if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
+
+# -----------------------------------------------------------------------------
 _window_focus_callback_repository = {}
 _callback_repositories.append(_window_focus_callback_repository)
 _glfw.glfwSetWindowFocusCallback.restype = _GLFWwindowfocusfun
 _glfw.glfwSetWindowFocusCallback.argtypes = [ctypes.POINTER(_GLFWwindow),
                                              _GLFWwindowfocusfun]
+
+
 def set_window_focus_callback(window, cbfun):
     '''
     Sets the focus callback for the specified window.
 
     Wrapper for:
-        GLFWwindowfocusfun glfwSetWindowFocusCallback(GLFWwindow* window, GLFWwindowfocusfun cbfun);
+        GLFWwindowfocusfun
+            glfwSetWindowFocusCallback(GLFWwindow* window,
+                                       GLFWwindowfocusfun cbfun);
     '''
     window_addr = ctypes.cast(ctypes.pointer(window),
                               ctypes.POINTER(ctypes.c_long)).contents.value
@@ -1243,17 +1387,23 @@ def set_window_focus_callback(window, cbfun):
     if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
+
+# -----------------------------------------------------------------------------
 _window_iconify_callback_repository = {}
 _callback_repositories.append(_window_iconify_callback_repository)
 _glfw.glfwSetWindowIconifyCallback.restype = _GLFWwindowiconifyfun
 _glfw.glfwSetWindowIconifyCallback.argtypes = [ctypes.POINTER(_GLFWwindow),
                                                _GLFWwindowiconifyfun]
+
+
 def set_window_iconify_callback(window, cbfun):
     '''
     Sets the iconify callback for the specified window.
 
     Wrapper for:
-        GLFWwindowiconifyfun glfwSetWindowIconifyCallback(GLFWwindow* window, GLFWwindowiconifyfun cbfun);
+        GLFWwindowiconifyfun glfwSetWindowIconifyCallback(
+            GLFWwindow* window,
+            GLFWwindowiconifyfun cbfun);
     '''
     window_addr = ctypes.cast(ctypes.pointer(window),
                               ctypes.POINTER(ctypes.c_long)).contents.value
@@ -1270,17 +1420,23 @@ def set_window_iconify_callback(window, cbfun):
     if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
+
+# -----------------------------------------------------------------------------
 _framebuffer_size_callback_repository = {}
 _callback_repositories.append(_framebuffer_size_callback_repository)
 _glfw.glfwSetFramebufferSizeCallback.restype = _GLFWframebuffersizefun
 _glfw.glfwSetFramebufferSizeCallback.argtypes = [ctypes.POINTER(_GLFWwindow),
                                                  _GLFWframebuffersizefun]
+
+
 def set_framebuffer_size_callback(window, cbfun):
     '''
     Sets the framebuffer resize callback for the specified window.
 
     Wrapper for:
-        GLFWframebuffersizefun glfwSetFramebufferSizeCallback(GLFWwindow* window, GLFWframebuffersizefun cbfun);
+        GLFWframebuffersizefun
+            glfwSetFramebufferSizeCallback(GLFWwindow* window,
+                                           GLFWframebuffersizefun cbfun);
     '''
     window_addr = ctypes.cast(ctypes.pointer(window),
                               ctypes.POINTER(ctypes.c_long)).contents.value
@@ -1297,8 +1453,12 @@ def set_framebuffer_size_callback(window, cbfun):
     if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwPollEvents.restype = None
 _glfw.glfwPollEvents.argtypes = []
+
+
 def poll_events():
     '''
     Processes all pending events.
@@ -1308,8 +1468,12 @@ def poll_events():
     '''
     _glfw.glfwPollEvents()
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwWaitEvents.restype = None
 _glfw.glfwWaitEvents.argtypes = []
+
+
 def wait_events():
     '''
     Waits until events are pending and processes them.
@@ -1319,9 +1483,13 @@ def wait_events():
     '''
     _glfw.glfwWaitEvents()
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetInputMode.restype = ctypes.c_int
 _glfw.glfwGetInputMode.argtypes = [ctypes.POINTER(_GLFWwindow),
                                    ctypes.c_int]
+
+
 def get_input_mode(window, mode):
     '''
     Returns the value of an input option for the specified window.
@@ -1331,10 +1499,14 @@ def get_input_mode(window, mode):
     '''
     return _glfw.glfwGetInputMode(window, mode)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwSetInputMode.restype = None
 _glfw.glfwSetInputMode.argtypes = [ctypes.POINTER(_GLFWwindow),
                                    ctypes.c_int,
                                    ctypes.c_int]
+
+
 def set_input_mode(window, mode, value):
     '''
     Sets an input option for the specified window.
@@ -1348,9 +1520,13 @@ def set_input_mode(window, mode, value):
     '''
     _glfw.glfwSetInputMode(window, mode, value)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetKey.restype = ctypes.c_int
 _glfw.glfwGetKey.argtypes = [ctypes.POINTER(_GLFWwindow),
                              ctypes.c_int]
+
+
 def get_key(window, key):
     '''
     Returns the last reported state of a keyboard key for the specified
@@ -1361,9 +1537,13 @@ def get_key(window, key):
     '''
     return _glfw.glfwGetKey(window, key)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetMouseButton.restype = ctypes.c_int
 _glfw.glfwGetMouseButton.argtypes = [ctypes.POINTER(_GLFWwindow),
                                      ctypes.c_int]
+
+
 def get_mouse_button(window, button):
     '''
     Returns the last reported state of a mouse button for the specified
@@ -1374,10 +1554,14 @@ def get_mouse_button(window, button):
     '''
     return _glfw.glfwGetMouseButton(window, button)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetCursorPos.restype = None
 _glfw.glfwGetCursorPos.argtypes = [ctypes.POINTER(_GLFWwindow),
                                    ctypes.POINTER(ctypes.c_double),
                                    ctypes.POINTER(ctypes.c_double)]
+
+
 def get_cursor_pos(window):
     '''
     Retrieves the last reported cursor position, relative to the client
@@ -1393,10 +1577,14 @@ def get_cursor_pos(window):
     _glfw.glfwGetCursorPos(window, xpos, ypos)
     return xpos_value.value, ypos_value.value
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwSetCursorPos.restype = None
 _glfw.glfwSetCursorPos.argtypes = [ctypes.POINTER(_GLFWwindow),
                                    ctypes.c_double,
                                    ctypes.c_double]
+
+
 def set_cursor_pos(window, xpos, ypos):
     '''
     Sets the position of the cursor, relative to the client area of the window.
@@ -1407,6 +1595,7 @@ def set_cursor_pos(window, xpos, ypos):
     _glfw.glfwSetCursorPos(window, xpos, ypos)
 
 
+# -----------------------------------------------------------------------------
 _key_callback_repository = {}
 _callback_repositories.append(_key_callback_repository)
 _glfw.glfwSetKeyCallback.restype = _GLFWkeyfun
@@ -1437,6 +1626,7 @@ def set_key_callback(window, cbfun):
         return previous_callback[0]
 
 
+# -----------------------------------------------------------------------------
 _char_callback_repository = {}
 _callback_repositories.append(_char_callback_repository)
 _glfw.glfwSetCharCallback.restype = _GLFWcharfun
@@ -1467,6 +1657,7 @@ def set_char_callback(window, cbfun):
         return previous_callback[0]
 
 
+# -----------------------------------------------------------------------------
 _mouse_button_callback_repository = {}
 _callback_repositories.append(_mouse_button_callback_repository)
 _glfw.glfwSetMouseButtonCallback.restype = _GLFWmousebuttonfun
@@ -1479,7 +1670,9 @@ def set_mouse_button_callback(window, cbfun):
     Sets the mouse button callback.
 
     Wrapper for:
-        GLFWmousebuttonfun glfwSetMouseButtonCallback(GLFWwindow* window, GLFWmousebuttonfun cbfun);
+        GLFWmousebuttonfun
+            glfwSetMouseButtonCallback(GLFWwindow* window,
+                                       GLFWmousebuttonfun cbfun);
     '''
     window_addr = ctypes.cast(ctypes.pointer(window),
                               ctypes.POINTER(ctypes.c_long)).contents.value
@@ -1497,6 +1690,7 @@ def set_mouse_button_callback(window, cbfun):
         return previous_callback[0]
 
 
+# -----------------------------------------------------------------------------
 _cursor_pos_callback_repository = {}
 _callback_repositories.append(_cursor_pos_callback_repository)
 _glfw.glfwSetCursorPosCallback.restype = _GLFWcursorposfun
@@ -1509,7 +1703,9 @@ def set_cursor_pos_callback(window, cbfun):
     Sets the cursor position callback.
 
     Wrapper for:
-        GLFWcursorposfun glfwSetCursorPosCallback(GLFWwindow* window, GLFWcursorposfun cbfun);
+        GLFWcursorposfun
+            glfwSetCursorPosCallback(GLFWwindow* window,
+                                     GLFWcursorposfun cbfun);
     '''
     window_addr = ctypes.cast(ctypes.pointer(window),
                               ctypes.POINTER(ctypes.c_long)).contents.value
@@ -1527,6 +1723,7 @@ def set_cursor_pos_callback(window, cbfun):
         return previous_callback[0]
 
 
+# -----------------------------------------------------------------------------
 _cursor_enter_callback_repository = {}
 _callback_repositories.append(_cursor_enter_callback_repository)
 _glfw.glfwSetCursorEnterCallback.restype = _GLFWcursorenterfun
@@ -1539,7 +1736,9 @@ def set_cursor_enter_callback(window, cbfun):
     Sets the cursor enter/exit callback.
 
     Wrapper for:
-        GLFWcursorenterfun glfwSetCursorEnterCallback(GLFWwindow* window, GLFWcursorenterfun cbfun);
+        GLFWcursorenterfun
+            glfwSetCursorEnterCallback(GLFWwindow* window,
+                                       GLFWcursorenterfun cbfun);
     '''
     window_addr = ctypes.cast(ctypes.pointer(window),
                               ctypes.POINTER(ctypes.c_long)).contents.value
@@ -1557,6 +1756,7 @@ def set_cursor_enter_callback(window, cbfun):
         return previous_callback[0]
 
 
+# -----------------------------------------------------------------------------
 _scroll_callback_repository = {}
 _callback_repositories.append(_scroll_callback_repository)
 _glfw.glfwSetScrollCallback.restype = _GLFWscrollfun
@@ -1569,7 +1769,8 @@ def set_scroll_callback(window, cbfun):
     Sets the scroll callback.
 
     Wrapper for:
-        GLFWscrollfun glfwSetScrollCallback(GLFWwindow* window, GLFWscrollfun cbfun);
+        GLFWscrollfun glfwSetScrollCallback(GLFWwindow* window,
+                                            GLFWscrollfun cbfun);
     '''
     window_addr = ctypes.cast(ctypes.pointer(window),
                               ctypes.POINTER(ctypes.c_long)).contents.value
@@ -1586,8 +1787,12 @@ def set_scroll_callback(window, cbfun):
     if previous_callback is not None and previous_callback[0] != 0:
         return previous_callback[0]
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwJoystickPresent.restype = ctypes.c_int
 _glfw.glfwJoystickPresent.argtypes = [ctypes.c_int]
+
+
 def joystick_present(joy):
     '''
     Returns whether the specified joystick is present.
@@ -1597,9 +1802,13 @@ def joystick_present(joy):
     '''
     return _glfw.glfwJoystickPresent(joy)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetJoystickAxes.restype = ctypes.POINTER(ctypes.c_float)
 _glfw.glfwGetJoystickAxes.argtypes = [ctypes.c_int,
                                       ctypes.POINTER(ctypes.c_int)]
+
+
 def get_joystick_axes(joy):
     '''
     Returns the values of all axes of the specified joystick.
@@ -1612,9 +1821,13 @@ def get_joystick_axes(joy):
     result = _glfw.glfwGetJoystickAxes(joy, count)
     return result, count_value.value
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetJoystickButtons.restype = ctypes.POINTER(ctypes.c_ubyte)
 _glfw.glfwGetJoystickButtons.argtypes = [ctypes.c_int,
                                          ctypes.POINTER(ctypes.c_int)]
+
+
 def get_joystick_buttons(joy):
     '''
     Returns the state of all buttons of the specified joystick.
@@ -1627,8 +1840,12 @@ def get_joystick_buttons(joy):
     result = _glfw.glfwGetJoystickButtons(joy, count)
     return result, count_value.value
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetJoystickName.restype = ctypes.c_char_p
 _glfw.glfwGetJoystickName.argtypes = [ctypes.c_int]
+
+
 def get_joystick_name(joy):
     '''
     Returns the name of the specified joystick.
@@ -1639,9 +1856,11 @@ def get_joystick_name(joy):
     return _glfw.glfwGetJoystickName(joy)
 
 
+# -----------------------------------------------------------------------------
 _glfw.glfwSetClipboardString.restype = None
 _glfw.glfwSetClipboardString.argtypes = [ctypes.POINTER(_GLFWwindow),
                                          ctypes.c_char_p]
+
 
 def set_clipboard_string(window, string):
     '''
@@ -1652,8 +1871,11 @@ def set_clipboard_string(window, string):
     '''
     _glfw.glfwSetClipboardString(window, _to_char_p(string))
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetClipboardString.restype = ctypes.c_char_p
 _glfw.glfwGetClipboardString.argtypes = [ctypes.POINTER(_GLFWwindow)]
+
 
 def get_clipboard_string(window):
     '''
@@ -1664,8 +1886,12 @@ def get_clipboard_string(window):
     '''
     return _glfw.glfwGetClipboardString(window)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetTime.restype = ctypes.c_double
 _glfw.glfwGetTime.argtypes = []
+
+
 def get_time():
     '''
     Returns the value of the GLFW timer.
@@ -1675,8 +1901,12 @@ def get_time():
     '''
     return _glfw.glfwGetTime()
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwSetTime.restype = None
 _glfw.glfwSetTime.argtypes = [ctypes.c_double]
+
+
 def set_time(time):
     '''
     Sets the GLFW timer.
@@ -1686,8 +1916,12 @@ def set_time(time):
     '''
     _glfw.glfwSetTime(time)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwMakeContextCurrent.restype = None
 _glfw.glfwMakeContextCurrent.argtypes = [ctypes.POINTER(_GLFWwindow)]
+
+
 def make_context_current(window):
     '''
     Makes the context of the specified window current for the calling
@@ -1698,8 +1932,12 @@ def make_context_current(window):
     '''
     _glfw.glfwMakeContextCurrent(window)
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwGetCurrentContext.restype = ctypes.POINTER(_GLFWwindow)
 _glfw.glfwGetCurrentContext.argtypes = []
+
+
 def get_current_context():
     '''
     Returns the window whose context is current on the calling thread.
@@ -1709,8 +1947,12 @@ def get_current_context():
     '''
     return _glfw.glfwGetCurrentContext()
 
+
+# -----------------------------------------------------------------------------
 _glfw.glfwSwapBuffers.restype = None
 _glfw.glfwSwapBuffers.argtypes = [ctypes.POINTER(_GLFWwindow)]
+
+
 def swap_buffers(window):
     '''
     Swaps the front and back buffers of the specified window.
@@ -1720,8 +1962,11 @@ def swap_buffers(window):
     '''
     _glfw.glfwSwapBuffers(window)
 
+# -----------------------------------------------------------------------------
 _glfw.glfwSwapInterval.restype = None
 _glfw.glfwSwapInterval.argtypes = [ctypes.c_int]
+
+
 def swap_interval(interval):
     '''
     Sets the swap interval for the current context.
@@ -1731,8 +1976,11 @@ def swap_interval(interval):
     '''
     _glfw.glfwSwapInterval(interval)
 
+# -----------------------------------------------------------------------------
 _glfw.glfwExtensionSupported.restype = ctypes.c_int
 _glfw.glfwExtensionSupported.argtypes = [ctypes.c_char_p]
+
+
 def extension_supported(extension):
     '''
     Returns whether the specified extension is available.
@@ -1742,8 +1990,11 @@ def extension_supported(extension):
     '''
     return _glfw.glfwExtensionSupported(_to_char_p(extension))
 
+# -----------------------------------------------------------------------------
 _glfw.glfwGetProcAddress.restype = ctypes.c_void_p
 _glfw.glfwGetProcAddress.argtypes = [ctypes.c_char_p]
+
+
 def get_proc_address(procname):
     '''
     Returns the address of the specified function for the current
@@ -1753,3 +2004,5 @@ def get_proc_address(procname):
         GLFWglproc glfwGetProcAddress(const char* procname);
     '''
     return _glfw.glfwGetProcAddress(_to_char_p(procname))
+
+# END
