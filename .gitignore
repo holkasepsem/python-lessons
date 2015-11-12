@@ -8,6 +8,9 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
+env*/
+venv/
+_venv*/
 build/
 develop-eggs/
 dist/
@@ -55,3 +58,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Private folder for experimantal code
+_private/
