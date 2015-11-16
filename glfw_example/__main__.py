@@ -1,4 +1,5 @@
 import glfw
+import OpenGL
 
 
 def main():
