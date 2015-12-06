@@ -24,7 +24,6 @@ def main():
     #init
     glfw.make_context_current(window)
 
-
     # loop
     while not glfw.window_should_close(window):
 
