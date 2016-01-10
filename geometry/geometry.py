@@ -53,6 +53,40 @@ class Line():
     def __init__():
         pass
 
+"""
+Napište funkci, která jako vstupní parametr vezme dva body, které představují 
+koncové body úhlopříčky čtyřúhelníku a vrací další dva body, které představují
+koncové body druhé úhlopříčky.
+
+Pomocí těchto bodů budeme poté konstruovat čtyřúhelník, podobně jako při 
+táhnutí myši na ploše počítače.
+"""
+
+def calculate_rectangle_points(p1, p2):
+    """
+    Vypočítá souřadnice dalších dvou bodů úhlopříčky čtyřúhelníku.
+
+    +----------------------+ 
+    |  u2              p2  |
+    |    +------------+    |
+    |    |            |    |
+    |    |            |    |
+    |    |            |    |
+    |    +------------+    |
+    |  p1              u1  |
+    +----------------------+
+    0,0
+
+    :param: Bod v ploše `p1` reprezentovaný n-ticí `(x, y)`.
+    :param: Bod v ploše `p2` reprezentovaný n-ticí `(x, y)`.
+    :return: Dva body `u1` a `u2` reprezentované n-ticemi `(x, y)`
+    """
+    dx = abs(p2.x - p1.x)
+    dy = abs(p2.y - p1.y)
+
+    u1 = (p1.x + dx, p1.y)
+    u2 = (p1.x, )
+
 # =============================================================================
 # SIMPLE TESTS
 # =============================================================================
