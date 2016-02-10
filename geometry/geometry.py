@@ -9,7 +9,6 @@ from math import sqrt
 # -----------------------------------------------------------------------------
 class Point:
 
-
     """
     Třída reprezentující bod v n-rozměrném euklidovském prostoru
     (prozatím jen kartézské souřadnice).
@@ -21,7 +20,7 @@ class Point:
         :coordinates: Kartézké souřadnice.
         """
         try:
-            self._coordinates = tuple((float(value) for value in coordinates))
+            self.coordinates = tuple((float(value) for value in coordinates))
             if not len((self._coordinates)):
                 raise ValueError("Musíte zadat alespoň jednu souřadnici!")
         except: 
@@ -32,16 +31,19 @@ class Point:
         for index in range(len(coordinates)):
             setattr(Point, "x" + str(index + 1), 
                 property(lambda self, 
-                    index=index: str(self.coordinates[index])))
+                    index=index: self.coordinates[index]))
             
     @property # getter
     def coordinates(self):
         return self._coordinates
 
     @coordinates.setter
-    def coordinates(self, value):
+    def coordinates(self, values):
         # TODO Ošetři podobně jako v `__init__`!
-        self._coordinates = value
+        if not hasattr(self, "_dimension"):
+            self._coordinates = values
+        else:
+            self._coordinates = values[0:self.dimension]
         self._dimension = len(self.coordinates)
         
     @property
