@@ -3,11 +3,11 @@ Implementace základních geometrických objektů.
 """
 
 import abc
+from math import sqrt
 
 
 # -----------------------------------------------------------------------------
 class Point:
-
 
     """
     Třída reprezentující bod v n-rozměrném euklidovském prostoru
@@ -20,7 +20,7 @@ class Point:
         :coordinates: Kartézké souřadnice.
         """
         try:
-            self._coordinates = tuple((float(value) for value in coordinates))
+            self.coordinates = tuple((float(value) for value in coordinates))
             if not len((self._coordinates)):
                 raise ValueError("Musíte zadat alespoň jednu souřadnici!")
         except: 
@@ -31,16 +31,19 @@ class Point:
         for index in range(len(coordinates)):
             setattr(Point, "x" + str(index + 1), 
                 property(lambda self, 
-                    index=index: str(self.coordinates[index])))
+                    index=index: self.coordinates[index]))
             
     @property # getter
     def coordinates(self):
         return self._coordinates
 
     @coordinates.setter
-    def coordinates(self, value):
+    def coordinates(self, values):
         # TODO Ošetři podobně jako v `__init__`!
-        self._coordinates = value
+        if not hasattr(self, "_dimension"):
+            self._coordinates = values
+        else:
+            self._coordinates = values[0:self.dimension]
         self._dimension = len(self.coordinates)
         
     @property
@@ -53,6 +56,7 @@ class Line():
     def __init__():
         pass
 
+
 # =============================================================================
 # SIMPLE TESTS
 # =============================================================================
@@ -64,3 +68,20 @@ if __name__ == "__main__":
     print(p.x1, p.x2, p.x3, p.x4, p.x5, p.x6)
     print(type(p.x1))
     print(type(p.coordinates)) 
+    
+    p1 = (1, 2)
+    p2 = (3, 4)
+    
+
+    import collections
+    Point2 = collections.namedtuple("Point2", "x y")
+
+     
+    p3 = Point2(1, 2)
+    p4 = Point2(3, 4)
+
+    print(p1[0])
+    print(p1[1])
+
+    print(p3.x)
+    print(p3.y)
